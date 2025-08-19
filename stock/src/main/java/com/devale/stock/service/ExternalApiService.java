@@ -1,8 +1,10 @@
 package com.devale.stock.service;
 
 import com.devale.stock.dao.StockDao;
+import com.devale.stock.dto.CompanyOverview;
 import com.devale.stock.model.Stock;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +17,7 @@ public class ExternalApiService {
     private final String apiKey;
     private final String baseUrl;
     private final StockDao stockDao;
+    ObjectMapper objectMapper = new ObjectMapper();
 
     public ExternalApiService(RestTemplate restTemplate,
                               @Value("${alphavantage.api.key}") String apiKey,
@@ -25,7 +28,7 @@ public class ExternalApiService {
         this.stockDao = stockDao;
     }
 
-    // Free daily candles (OHLC + volume). Use outputsize=full for long history.
+
     public String fetchDailyRaw(String symbol, String outputSize) {
         UriComponentsBuilder b = UriComponentsBuilder.fromHttpUrl(baseUrl)
                 .queryParam("function", "TIME_SERIES_DAILY")
@@ -36,9 +39,8 @@ public class ExternalApiService {
         return restTemplate.getForObject(b.toUriString(), String.class);
     }
 
-    // Service
     public void syncCompanyOverview(String symbol) {
-        // call external API
+
         String url = "https://www.alphavantage.co/query?function=OVERVIEW&symbol="
                 + symbol + "&apikey=" + apiKey;
         JsonNode overview = restTemplate.getForObject(url, JsonNode.class);
@@ -51,7 +53,7 @@ public class ExternalApiService {
         String sector = overview.path("Sector").asText("UNKNOWN");
         long sharesOutstanding = overview.path("SharesOutstanding").asLong(0);
 
-        Stock stock = stockDao.getStockBySymbol(symbol);
+        Stock stock = stockDao.findBySymbol(symbol);
         if (stock == null) {
             stock = new Stock();
             stock.setSymbol(symbol);
@@ -60,7 +62,38 @@ public class ExternalApiService {
         stock.setSector(sector);
         stock.setSharesOutstanding(sharesOutstanding);
 
+        System.out.println("Overview from API for " + symbol + ": " + overview);
+        System.out.println("Mapped stock: " + stock);
+
         stockDao.upsertStock(stock);
+    }
+    public CompanyOverview fetchCompanyOverview(String symbol) {
+        String url = baseUrl + "/query?function=OVERVIEW&symbol=" + symbol + "&apikey=" + apiKey;
+        String response = restTemplate.getForObject(url, String.class);
+
+        try {
+            JsonNode root = objectMapper.readTree(response);
+
+            CompanyOverview overview = new CompanyOverview();
+            overview.setSymbol(root.path("Symbol").asText(symbol));
+            overview.setName(root.path("Name").asText(symbol));
+            overview.setSector(root.path("Sector").asText("UNKNOWN"));
+            overview.setSharesOutstanding(root.path("SharesOutstanding").asLong(0));
+
+            return overview;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to parse company overview for " + symbol, e);
+        }
+    }
+    public String getInsiderTransactions(String symbol){
+        String url = baseUrl+"?function=INSIDER_TRANSACTIONS&symbol="+symbol+"&apikey="+apiKey;
+        return restTemplate.getForObject(url,String.class);
+    }
+
+    public JsonNode fetchIncomeStatement(String symbol) {
+        String url = baseUrl + "/query?function=INCOME_STATEMENT&symbol=" + symbol + "&apikey=" + apiKey;
+        return restTemplate.getForObject(url, JsonNode.class);
     }
 
 }

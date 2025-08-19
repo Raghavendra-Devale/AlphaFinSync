@@ -16,6 +16,10 @@ public class ExternalApiController {
         System.out.println("hereeee ");
         return externalAPIService.fetchDailyRaw(symbol,null);
     }
+    @GetMapping("/stock/insidertransaction/{symbol}")
+    public String getInsiderTransactions(@PathVariable String symbol){
+        return externalAPIService.getInsiderTransactions(symbol);
+    }
 
 }
 

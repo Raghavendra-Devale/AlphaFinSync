@@ -18,7 +18,7 @@ public class StockSyncController {
         this.stockPriceService = stockPriceService;
     }
 
-    // e.g. /stocks/AAPL/sync-daily?start=2025-08-01&end=2025-08-16
+
     @GetMapping("/{symbol}/sync-daily")
     public List<StockPrice> syncDaily(
             @PathVariable String symbol,

@@ -118,8 +118,12 @@ public class StockDao {
         if (existing == null) {
             insertStock(stock);
         } else {
-            updateStock(stock);
+            if (stock.getName() != null) existing.setName(stock.getName());
+            if (stock.getSector() != null) existing.setSector(stock.getSector());
+            if (stock.getSharesOutstanding() != null) existing.setSharesOutstanding(stock.getSharesOutstanding());
+            updateStock(existing);
         }
     }
+
 
 }
