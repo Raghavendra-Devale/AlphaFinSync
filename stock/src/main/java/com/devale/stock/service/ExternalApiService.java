@@ -68,7 +68,7 @@ public class ExternalApiService {
         stockDao.upsertStock(stock);
     }
     public CompanyOverview fetchCompanyOverview(String symbol) {
-        String url = baseUrl + "/query?function=OVERVIEW&symbol=" + symbol + "&apikey=" + apiKey;
+        String url = baseUrl + "?function=OVERVIEW&symbol=" + symbol + "&apikey=" + apiKey;
         String response = restTemplate.getForObject(url, String.class);
 
         try {
@@ -92,8 +92,20 @@ public class ExternalApiService {
     }
 
     public JsonNode fetchIncomeStatement(String symbol) {
-        String url = baseUrl + "/query?function=INCOME_STATEMENT&symbol=" + symbol + "&apikey=" + apiKey;
+        String url = baseUrl + "?function=INCOME_STATEMENT&symbol=" + symbol + "&apikey=" + apiKey;
         return restTemplate.getForObject(url, JsonNode.class);
     }
+
+    public JsonNode fetchCompanyOverviewRaw(String symbol) {
+        String url = baseUrl + "?function=OVERVIEW&symbol=" + symbol + "&apikey=" + apiKey;
+        return restTemplate.getForObject(url, JsonNode.class);
+    }
+
+    public JsonNode fetchEarnings(String symbol) {
+        String url = baseUrl + "?function=EARNINGS&symbol=" + symbol + "&apikey=" + apiKey;
+        return restTemplate.getForObject(url, JsonNode.class);
+    }
+
+
 
 }

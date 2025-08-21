@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 @Repository
 public class FinancialDao {
@@ -51,10 +52,14 @@ public class FinancialDao {
                 fin.setId(rs.getLong("id"));
                 fin.setStockId(rs.getLong("stock_id"));
                 fin.setYear(rs.getInt("year"));
-                fin.setRevenue(rs.getDouble("revenue"));
-                fin.setNetIncome(rs.getDouble("net_income"));
-                fin.setEps(rs.getDouble("eps"));
-                fin.setMarketCap(rs.getDouble("market_cap"));
+                BigDecimal revenueBd = rs.getBigDecimal("revenue");
+                BigDecimal netIncomeBd = rs.getBigDecimal("net_income");
+                BigDecimal epsBd = rs.getBigDecimal("eps");
+                BigDecimal marketCapBd = rs.getBigDecimal("market_cap");
+                fin.setRevenue(revenueBd != null ? revenueBd.doubleValue() : null);
+                fin.setNetIncome(netIncomeBd != null ? netIncomeBd.doubleValue() : null);
+                fin.setEps(epsBd != null ? epsBd.doubleValue() : null);
+                fin.setMarketCap(marketCapBd != null ? marketCapBd.doubleValue() : null);
                 return fin;
             }, stockId, year);
         } catch (EmptyResultDataAccessException e) {
@@ -69,10 +74,15 @@ public class FinancialDao {
             f.setId(rs.getLong("id"));
             f.setStockId(rs.getLong("stock_id"));
             f.setYear(rs.getInt("year"));
-            f.setRevenue(rs.getDouble("revenue"));
-            f.setNetIncome(rs.getDouble("net_income"));
-            f.setEps(rs.getDouble("eps"));
-            f.setMarketCap(rs.getDouble("market_cap"));
+            BigDecimal epsBd = rs.getBigDecimal("eps");
+            BigDecimal revenueBd = rs.getBigDecimal("revenue");
+            BigDecimal netIncomeBd = rs.getBigDecimal("net_income");
+            BigDecimal marketCapBd = rs.getBigDecimal("market_cap");
+            f.setEps(epsBd != null ? epsBd.doubleValue() : null);
+            f.setRevenue(revenueBd != null ? revenueBd.doubleValue() : null);
+            f.setNetIncome(netIncomeBd != null ? netIncomeBd.doubleValue() : null);
+            f.setMarketCap(marketCapBd != null ? marketCapBd.doubleValue() : null);
+
             return f;
         }, stockId);
     }

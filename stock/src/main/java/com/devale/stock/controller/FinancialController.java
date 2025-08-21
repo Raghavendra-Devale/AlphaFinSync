@@ -3,6 +3,8 @@ package com.devale.stock.controller;
 import com.devale.stock.model.Financial;
 import com.devale.stock.service.FinancialService;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
 
@@ -30,14 +32,44 @@ public class FinancialController {
 
 
     @PostMapping("/{symbol}")
-    public String insertFinancial(@PathVariable String symbol, @RequestBody Financial financial) {
-        financialService.insertFinancial(symbol, financial);
-        return "Inserted financials for " + symbol + " successfully";
+    public ResponseEntity<String> insertFinancial(@PathVariable String symbol, @RequestBody Financial financial) {
+        try {
+            financialService.insertFinancial(symbol, financial);
+            return ResponseEntity.ok("Inserted financials for " + symbol + " successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Insert failed: " + e.getMessage());
+        }
     }
 
 
     @PutMapping("/{symbol}")
-    public String upsertFinancial(@PathVariable String symbol, @RequestBody Financial financial) {
-        return financialService.upsert(symbol, financial);
+    public ResponseEntity<String> upsertFinancial(@PathVariable String symbol, @RequestBody Financial financial) {
+        try {
+            String msg = financialService.upsert(symbol, financial);
+            return ResponseEntity.ok(msg);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Upsert failed: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/sync/{symbol}")
+    public ResponseEntity<String> syncFinancials(@PathVariable String symbol) {
+        try {
+            financialService.syncFinancialsFromApi(symbol);
+            return ResponseEntity.ok("Financials for " + symbol + " synced successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Sync failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/sync/eps/{symbol}")
+    public ResponseEntity<String> syncFinancialsQuarterlyFromApi(@PathVariable String symbol) {
+        try {
+            financialService.syncFinancialsFromApiQuarter(symbol);
+            return ResponseEntity.ok("Quarterly EPS for " + symbol + " synced successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Quarterly EPS sync failed: " + e.getMessage());
+        }
     }
 }
