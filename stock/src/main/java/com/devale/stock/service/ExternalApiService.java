@@ -43,7 +43,7 @@ public class ExternalApiService {
 
         String url = "https://www.alphavantage.co/query?function=OVERVIEW&symbol="
                 + symbol + "&apikey=" + apiKey;
-        JsonNode overview = restTemplate.getForObject(url, JsonNode.class);
+            JsonNode overview = restTemplate.getForObject(url, JsonNode.class);
 
         if (overview == null || overview.isEmpty()) {
             throw new RuntimeException("No overview data for " + symbol);
