@@ -1,0 +1,38 @@
+<div class="container-fluid">
+
+  <!-- Stock Info -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Stock</h6>
+          <h4>{{ dashboardData.symbol }}</h4>
+          <small>{{ dashboardData.companyName }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Line Chart -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5>{{ dashboardData.symbol }} Price Trend</h5>
+      <div
+        id="stockChart"
+        style="height: 350px; width: 100%;">
+      </div>
+    </div>
+  </div>
+
+  <!-- Pie Chart -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5>Sector Allocation</h5>
+      <div
+        id="sectorChart"
+        style="height: 300px; width: 100%;">
+      </div>
+    </div>
+  </div>
+
+</div>
